@@ -46,6 +46,14 @@ jobs:
             echo "is_github=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Print Ubuntu version info
+        run: |
+          echo "---- Ubuntu LSB release ----"
+          lsb_release -a
+
+          echo "---- Kernel Version ----"
+          uname -r
+
       - name: Checkout repository
         uses: actions/checkout@v5
 
