@@ -30,7 +30,7 @@ jobs:
   qa:
     strategy:
       matrix:
-        blender_version: ['4.2.0', '4.5.3']
+        blender_version: ['4.5.3', '5.0.1']
 
     runs-on: ubuntu-latest
     environment: QA
@@ -45,6 +45,14 @@ jobs:
           else
             echo "is_github=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Print Ubuntu version info
+        run: |
+          echo "---- Ubuntu LSB release ----"
+          lsb_release -a
+
+          echo "---- Kernel Version ----"
+          uname -r
 
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -93,8 +101,9 @@ jobs:
           tar -xf $BLENDER_TEMP/$BLENDER_TAR -C $BLENDER_TEMP
           echo "Extracted to $BLENDER_TEMP"/
           rm $BLENDER_TEMP/$BLENDER_TAR
-          # Set Blender in PATH
-          echo "$BLENDER_PATH" >> $GITHUB_PATH
+
+      - name: Add Blender to PATH
+        run: echo "$BLENDER_PATH" >> $GITHUB_PATH
 
       - name: Install Blender system dependencies
         if: ${{ steps.detect_env.outputs.is_github == 'false' }}
@@ -109,12 +118,12 @@ jobs:
             libxrandr2 \
             libxinerama1 \
             libxkbcommon0 \
-            libgl1-mesa-glx \
+            libgl1 \
             libglew2.2 \
             libsndfile1 \
             libjpeg-dev \
             libpng-dev \
-            libtiff5 \
+            libtiff6 \
             libxcursor1
       
       - name: Test Blender installed
