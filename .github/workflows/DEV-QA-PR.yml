@@ -30,7 +30,7 @@ jobs:
   qa:
     strategy:
       matrix:
-        blender_version: ['4.2.0', '4.5.3']
+        blender_version: ['4.5.3', '5.0.1']
 
     runs-on: ubuntu-latest
     environment: QA
