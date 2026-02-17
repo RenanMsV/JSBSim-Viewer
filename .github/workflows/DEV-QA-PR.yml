@@ -109,12 +109,12 @@ jobs:
             libxrandr2 \
             libxinerama1 \
             libxkbcommon0 \
-            libgl1-mesa-glx \
+            libgl1 \
             libglew2.2 \
             libsndfile1 \
             libjpeg-dev \
             libpng-dev \
-            libtiff5 \
+            libtiff6 \
             libxcursor1
       
       - name: Test Blender installed
