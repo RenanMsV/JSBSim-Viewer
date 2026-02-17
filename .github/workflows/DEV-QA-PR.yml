@@ -27,6 +27,42 @@ jobs:
 
       - run: flake8 . --config setup.cfg
       - run: pylint --rcfile setup.cfg .
+
+      - name: Ensure CHANGELOG.md updated when required
+        run: |
+          set -e
+
+          echo "Base SHA: ${{ github.event.pull_request.base.sha }}"
+          echo "Head SHA: ${{ github.sha }}"
+
+          git fetch --no-tags --prune --depth=100 origin
+
+          CHANGED_FILES=$(git diff --name-only \
+            ${{ github.event.pull_request.base.sha }} \
+            ${{ github.sha }})
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Define files that DO NOT require changelog updates
+          IGNORE_PATTERN="^(CHANGELOG.md|README.md|CONTRIBUTING.md|LICENSE|\.gitignore|\.vscode/|\.github/|tests/)"
+
+          # Check if any changed file is NOT ignored
+          REQUIRES_CHANGELOG=$(echo "$CHANGED_FILES" | grep -Ev "$IGNORE_PATTERN" || true)
+
+          if [ -n "$REQUIRES_CHANGELOG" ]; then
+            echo "Code changes detected:"
+            echo "$REQUIRES_CHANGELOG"
+
+            if ! echo "$CHANGED_FILES" | grep -q "CHANGELOG.md"; then
+              echo "❌ ERROR: Code changes detected but CHANGELOG.md was not updated."
+              exit 1
+            fi
+
+            echo "✅ CHANGELOG.md updated for code changes."
+          else
+            echo "ℹ️ Only docs/config/CI changes detected. CHANGELOG not required."
+          fi
   qa:
     strategy:
       matrix:
