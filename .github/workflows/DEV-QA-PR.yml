@@ -93,8 +93,9 @@ jobs:
           tar -xf $BLENDER_TEMP/$BLENDER_TAR -C $BLENDER_TEMP
           echo "Extracted to $BLENDER_TEMP"/
           rm $BLENDER_TEMP/$BLENDER_TAR
-          # Set Blender in PATH
-          echo "$BLENDER_PATH" >> $GITHUB_PATH
+
+      - name: Add Blender to PATH
+        run: echo "$BLENDER_PATH" >> $GITHUB_PATH
 
       - name: Install Blender system dependencies
         if: ${{ steps.detect_env.outputs.is_github == 'false' }}
