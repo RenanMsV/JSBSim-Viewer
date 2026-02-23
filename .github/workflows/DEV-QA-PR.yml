@@ -1,7 +1,7 @@
 name: DEV/QA PR # Lint then Test on Pull Requests
 
 on:
-  workflow_dispatch:   # allows manual trigger
+  # workflow_dispatch:   # allows manual trigger
   pull_request:
     branches:
       - main           # runs on PRs targeting main
@@ -14,6 +14,40 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Ensure CHANGELOG.md updated when required
+        run: |
+          set -e
+
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.sha }}
+
+          if [ -z "$BASE_SHA" ]; then
+            echo "❌ ERROR: pull_request.base.sha is missing."
+            echo "If you are running this locally with act, did you forget to provide a pull_request payload.json?"
+            exit 1
+          fi
+
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA")
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          IGNORE_PATTERN="^(CHANGELOG.md$|README.md$|CONTRIBUTING.md$|LICENSE$|\.gitignore$|setup.cfg$|\.vscode/|\.github/|tests/|assets/)"
+
+          REQUIRES_CHANGELOG=$(echo "$CHANGED_FILES" | grep -Ev "$IGNORE_PATTERN" || true)
+
+          if [ -n "$REQUIRES_CHANGELOG" ]; then
+            if ! echo "$CHANGED_FILES" | grep -q "^CHANGELOG.md$"; then
+              echo "❌  ERROR: Code changes detected but CHANGELOG.md was not updated."
+              exit 1
+            fi
+            echo "✅  CHANGELOG.md updated for code changes."
+          else
+            echo "⚠️  Only docs/config/CI changes detected. CHANGELOG not required."
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,6 +61,7 @@ jobs:
 
       - run: flake8 . --config setup.cfg
       - run: pylint --rcfile setup.cfg .
+
   qa:
     strategy:
       matrix:
