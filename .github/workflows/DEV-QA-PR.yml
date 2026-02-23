@@ -1,7 +1,7 @@
 name: DEV/QA PR # Lint then Test on Pull Requests
 
 on:
-  workflow_dispatch:   # allows manual trigger
+  # workflow_dispatch:   # allows manual trigger
   pull_request:
     branches:
       - main           # runs on PRs targeting main
