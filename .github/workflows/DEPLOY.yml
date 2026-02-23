@@ -59,8 +59,8 @@ jobs:
 
       - name: Deploy to Blender Extensions Platform API
         env:
-          BLENDER_API_URL: https://extensions.blender.org/api/v1/extensions/${{ env.EXT_ID }}/versions/upload/
-          BLENDER_REFERER_URL: https://extensions.blender.org/add-ons/${{ env.EXT_ID }}/
+          BLENDER_API_URL: https://extensions.blender.org/api/v1/extensions/${{ env.ext_id }}/versions/upload/
+          BLENDER_REFERER_URL: https://extensions.blender.org/add-ons/${{ env.ext_id }}/
         run: |
           # Extract release notes from CHANGELOG.md
           RELEASE_NOTES=$(awk -v ver="${{ env.ext_version }}" '
